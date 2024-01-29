@@ -126,17 +126,24 @@ function read(req, res, next) {
 }
 
 // PUT
-function update(req, res) {
-  const orderId = req.params.orderId;
-  const { deliverTo, mobileNumber, status, dishes } = req.body.data;
-  const updatedOrder = {
-    id: orderId,
-    deliverTo: deliverTo,
-    mobileNumber: mobileNumber,
-    status: status,
-    dishes: dishes,
-  };
-  return res.json({ data: updatedOrder });
+function update(req, res, next) {
+  const { orderId } = req.params; 
+  const order = res.locals.order;
+  const { id, deliverTo, mobileNumber, status, dishes } = req.body.data;
+
+  if (id && id !== orderId) {
+    return next({
+      status: 400,
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${orderId}`
+    });
+  }
+
+  order.deliverTo = deliverTo;
+  order.mobileNumber = mobileNumber;
+  order.status = status;
+  order.dishes = dishes;
+
+  return res.json({ data: order });
 }
 
 // DELETE
