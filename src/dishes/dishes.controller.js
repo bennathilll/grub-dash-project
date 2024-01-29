@@ -86,17 +86,24 @@ function read(req, res, next) {
 }
 
 // PUT
-function update(req, res) {
-  const dishId = req.params.dishId;
-  const { name, description, price, image_url } = req.body.data;
-  const updatDish = {
-    id: dishId,
-    name: name,
-    description: description,
-    price: price,
-    image_url: image_url,
-  };
-  return res.json({ data: updatDish });
+function update(req, res, next) {
+  const { dishId } = req.params; 
+  const dish = res.locals.dish;
+  const { id, name, description, price, image_url } = req.body.data;
+
+  if (id && id !== dishId) {
+    return next({
+      status: 400,
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`
+    });
+  }
+
+  dish.name = name;
+  dish.description = description;
+  dish.price = price;
+  dish.image_url = image_url;
+
+  return res.json({ data: dish });
 }
 
 // DELETE
